@@ -13,6 +13,8 @@ CC := gcc
 CFLAGS := -g -Wall -std=c99 $(INCS)
 LDFLAGS :=
 
+CFLAGS += -MMD -MP
+
 all: $(EXEC)
 
 $(EXEC): $(OBJS)
@@ -30,3 +32,5 @@ clean:
 $(shell mkdir -p $(DIRS))
 
 .PHONY: run clean all
+
+-include $(OBJS:.o=.d)
