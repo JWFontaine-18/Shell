@@ -10,11 +10,19 @@ int newProcess() {
 }
 
 //placeholder for cleaning memory associated with this code
-void cleanProcesses(int* processes) {
+//pipes is assumed to take the form int[ int[2] , int[2] ]
+void cleanProcesses(int* processes , int* pipes) {
 
-    int length = sizeof(processes) / sizeof(int);
+    int processesLength = sizeof(processes) / sizeof(int);
+    int pipesLength = sizeof(pipes) / sizeof(int);
 
     free(processes);
+
+    for(int i = 0 ; i < pipesLength ; i++) {
+        free(pipes[i]);
+    }
+
+    free(pipes);
 }
 
 //returns pointer to array of child pids
@@ -40,7 +48,7 @@ int* createChildProcesses( int numProcesses) {
 //the array is all of the 
 int* createIoBuffers(int numProcesses) {
     
-    int* processes = (int*) malloc((numProcesses - 1) * sizeof(int));
+    int** processes = (int**) malloc((numProcesses - 1) * sizeof(int*));
 
     for( int i = 0 ; i < numProcesses - 1 ; i++){
         processes[i] = (int*) malloc(2 * sizeof(int));
@@ -50,7 +58,7 @@ int* createIoBuffers(int numProcesses) {
 }
 
 //assumes we are inside a child process - DO NOT CALL IN PARENT , or do idk im not ur mom
-void reassignFileHandlers( int* processIds ) {
+int** createPipes( int* processIds ) {
 
     //because i dont trust you
     int length =  sizeof(processIds) / sizeof(int);
@@ -64,8 +72,17 @@ void reassignFileHandlers( int* processIds ) {
 
     //assumed to be inside child process
 
-    int *
+    int** buffers = createIoBuffers(length);
 
+    for(int i = 0 ; i < length - 1; i++) {
+
+        int success = pipe(buffers[i]);
+
+        if(!success) {
+            fprintf(stderr , "unable to process command. Exiting...");
+            exit(1);
+        }
+    }
+
+    return buffers;
 }
-
-pipe()
