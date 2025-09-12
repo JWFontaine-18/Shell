@@ -11,7 +11,7 @@ int newProcess() {
 
 //placeholder for cleaning memory associated with this code
 //pipes is assumed to take the form int[ int[2] , int[2] ]
-void cleanProcesses(int* processes , int* pipes) {
+void cleanProcesses(int* processes , int** pipes) {
 
     int processesLength = sizeof(processes) / sizeof(int);
     int pipesLength = sizeof(pipes) / sizeof(int);
@@ -42,11 +42,13 @@ int* createChildProcesses( int numProcesses) {
         processIds[i] = processId;
     }
 
+    return processIds;
+
 }
 
 //returns pointer to array of 2 element arrays - MUST FREE ALL ARRAY SLOTS AND THEN FREE TOPLEVEL ARRAY ON DESTROY
 //the array is all of the 
-int* createIoBuffers(int numProcesses) {
+int** createIoBuffers(int numProcesses) {
     
     int** processes = (int**) malloc((numProcesses - 1) * sizeof(int*));
 
@@ -58,6 +60,7 @@ int* createIoBuffers(int numProcesses) {
 }
 
 //assumes we are inside a child process - DO NOT CALL IN PARENT , or do idk im not ur mom
+//returns an array of pipes - each pipe is an array of 2 ints
 int** createPipes( int* processIds ) {
 
     //because i dont trust you
@@ -78,7 +81,7 @@ int** createPipes( int* processIds ) {
 
         int success = pipe(buffers[i]);
 
-        if(!success) {
+        if(success == -1) {
             fprintf(stderr , "unable to process command. Exiting...");
             exit(1);
         }
