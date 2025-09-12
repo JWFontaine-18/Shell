@@ -66,7 +66,7 @@ int** createPipes( int* processIds , int idsLength) {
     for( int i = 0 ; i < idsLength ; i++) {
         
         if(processIds[i] != 0) { //inside parent
-            return;
+            return NULL;
         }
     }
 
