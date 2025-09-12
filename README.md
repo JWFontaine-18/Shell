@@ -85,7 +85,7 @@ make run
 This will run the program ...
 
 ## Development Log
-Each member records their contributions here.
+9/12/25 - Part 3 implemented by Steven Kester
 
 ### [Member 1]
 

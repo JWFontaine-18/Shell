@@ -28,6 +28,17 @@ int main()
 			printf("token %d: (%s)\n", i, tokens->items[i]);
 		}
 
+		/*
+        Part 3
+        turns ~ -> $HOME and ~/dir -> $HOME/dir.
+        */
+        expand_tilde(tokens);
+
+        //Show tokens again after tilde expansion (debugging stuff)
+        for (int i = 0; i < tokens->size; i++) { 
+            printf("token %d: (%s)\n", i, tokens->items[i]); 
+        } //Part 3
+
 		free(input);
 		free_tokens(tokens);
 		

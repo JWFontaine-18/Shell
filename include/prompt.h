@@ -6,4 +6,6 @@ void prompt();
 
 void expand_env_var(tokenlist * tokens);
 
+void expand_tilde(tokenlist *tokens);
+
 #endif
