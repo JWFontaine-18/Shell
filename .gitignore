@@ -3,3 +3,6 @@ shell/.DS_Store
 shell/.vscode/settings.json
 shell/starter/.DS_Store
 .vscode/settings.json
+obj
+include
+bin
