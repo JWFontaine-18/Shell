@@ -33,6 +33,10 @@ int* createChildProcesses( int numProcesses) {
         
         int processId = newProcess();
 
+        if(processId == 0 ) {
+            return NUll;
+        }
+
         if(processId < 0){
             fprintf(stderr , "unable to execute command exiting...");
             exit(1); //it failed - ooooooooooof
@@ -52,7 +56,15 @@ int** createIoBuffers(int numProcesses) {
     int** processes = (int**) malloc((numProcesses - 1) * sizeof(int*));
 
     for( int i = 0 ; i < numProcesses - 1 ; i++){
+
         processes[i] = (int*) malloc(2 * sizeof(int));
+
+        int success = pipe(processes[i]);
+
+        if(success == -1) {
+            fprintf(stderr , "unable to process command. Exiting...");
+            exit(1);
+        }
     }
 
     return processes;
@@ -61,7 +73,6 @@ int** createIoBuffers(int numProcesses) {
 //assumes we are inside a child process - DO NOT CALL IN PARENT , or do idk im not ur mom
 //returns an array of pipes - each pipe is an array of 2 ints
 int** createPipes( int* processIds , int idsLength) {
-
 
     for( int i = 0 ; i < idsLength ; i++) {
         
@@ -72,17 +83,8 @@ int** createPipes( int* processIds , int idsLength) {
 
     //assumed to be inside child process
 
+    //returns an array of buffers of the length needed to link the processes together
     int** buffers = createIoBuffers(idsLength);
-
-    for(int i = 0 ; i < idsLength - 1; i++) {
-
-        int success = pipe(buffers[i]);
-
-        if(success == -1) {
-            fprintf(stderr , "unable to process command. Exiting...");
-            exit(1);
-        }
-    }
 
     return buffers;
 }
