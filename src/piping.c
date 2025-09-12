@@ -13,14 +13,11 @@ int newProcess() {
 
 //placeholder for cleaning memory associated with this code
 //pipes is assumed to take the form int[ int[2] , int[2] ]
-void cleanProcesses(int* processes , int** pipes) {
-
-    int processesLength = sizeof(processes) / sizeof(int);
-    int pipesLength = sizeof(pipes) / sizeof(int);
+void cleanProcesses(int* processes , int processCount , int** pipes , int pipesCount) {
 
     free(processes);
 
-    for(int i = 0 ; i < pipesLength ; i++) {
+    for(int i = 0 ; i < pipesCount ; i++) {
         free(pipes[i]);
     }
 
@@ -63,12 +60,10 @@ int** createIoBuffers(int numProcesses) {
 
 //assumes we are inside a child process - DO NOT CALL IN PARENT , or do idk im not ur mom
 //returns an array of pipes - each pipe is an array of 2 ints
-int** createPipes( int* processIds ) {
+int** createPipes( int* processIds , int idsLength) {
 
-    //because i dont trust you
-    int length =  sizeof(processIds) / sizeof(int);
 
-    for( int i = 0 ; i < length ; i++) {
+    for( int i = 0 ; i < idsLength ; i++) {
         
         if(processIds[i] != 0) { //inside parent
             return;
@@ -77,9 +72,9 @@ int** createPipes( int* processIds ) {
 
     //assumed to be inside child process
 
-    int** buffers = createIoBuffers(length);
+    int** buffers = createIoBuffers(idsLength);
 
-    for(int i = 0 ; i < length - 1; i++) {
+    for(int i = 0 ; i < idsLength - 1; i++) {
 
         int success = pipe(buffers[i]);
 
