@@ -1,5 +1,6 @@
 #include "lexer.h"
 #include "prompt.h"
+#include "piping.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>

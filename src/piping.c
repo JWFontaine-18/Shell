@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <unistd.h>
+#include "piping.h"
 #include <sys/types.h>
+#include <sys/wait.h>
 #include <stdlib.h>
 
 //placeholder for cleaning memory associated with this code
@@ -18,7 +20,9 @@ void cleanProcesses(int* processes , int processCount , int** pipes , int pipesC
 
 //returns pointer to array of child pids
 //the array commands contains the commands to be executed with piping in order , num commnads in the number of them
-int createChildProcesses(char* commands , int numCommands) {
+//WILL NEED TO MODIFY TO SUPPORT BACHGROUND PROCESSES
+//args is a 2-d array of arguments to the respective commands. empty array if none. same length as commands
+int createChildProcesses(char* commands , int numCommands , char** args) {
     
     int* processIds = (int*) malloc(sizeof(int) * (numCommands));
 
@@ -37,12 +41,37 @@ int createChildProcesses(char* commands , int numCommands) {
         if(processId == 0 ) { //inside child process
             
             //execute commands as needed
+
+            if( i == 0 ) {
+
+                dup2(processPipes[0][1] , STDOUT_FILENO); //replace stdout with write end of pipe
+
+                //first subproces now has write end of pipe as stdout
+            }
+            else if( i == numCommands - 1) { //last command goes to stdout EDIT TO SUPPORT REDIRECTS MAYBE
+
+                dup2(processPipes[ i - 1][0] , STDIN_FILENO); //takes input from previous command
+
+                //final subprocess now takes input from previous process and puts it to stdin
+            }
+            else { //any inbetween
+                dup2(processPipes[ i - 1][0] , STDIN_FILENO); //takes input from previous
+                dup2(processPipes[i][1] , STDOUT_FILENO); //puts output to next
+            }
+
+            execv(commands[i] , args[i] );
+
         }
         else { //inside parent
+            
             //await completion
         }
         
         processIds[i] = processId;
+    }
+
+    for(int i = 0 ; i < numCommands ; i++) {
+        waitpid(processIds[i] , 0 ,  0);
     }
 
     //free allocated memory
