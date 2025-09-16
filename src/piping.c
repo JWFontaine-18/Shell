@@ -34,7 +34,7 @@ int* createChildProcesses( int numProcesses) {
         int processId = newProcess();
 
         if(processId == 0 ) {
-            return NUll;
+            return NULL;
         }
 
         if(processId < 0){
