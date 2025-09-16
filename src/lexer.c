@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include "path_search.h"
 
 int main()
 {
@@ -28,16 +29,32 @@ int main()
 			printf("token %d: (%s)\n", i, tokens->items[i]);
 		}
 
-		/*
-        Part 3
-        turns ~ -> $HOME and ~/dir -> $HOME/dir.
-        */
+        //turns ~ -> $HOME and ~/dir -> $HOME/dir.
         expand_tilde(tokens);
 
         //Show tokens again after tilde expansion (debugging stuff)
         for (int i = 0; i < tokens->size; i++) { 
             printf("token %d: (%s)\n", i, tokens->items[i]); 
-        } //Part 3
+        }
+
+
+        /* [Part 4 - ADDED] PATH search
+        If the command is not a built-in and has no /, try to
+        resolve it against $PATH and show what would be executed. */
+        if (tokens->size > 0 && tokens->items[0]) {               
+            const char *cmd = tokens->items[0];                   
+            if (!is_builtin(cmd)) {                               
+                char *resolved = search_path_for_command(cmd);    
+                if (resolved) {                                   
+                    printf("[resolve] %s\n", resolved);           
+                    free(resolved);                               
+                } else {
+                    // If it's a built-in we print nothing here; if not found in PATH, say so.
+                    if (strchr(cmd, '/') == NULL)                 
+                        printf("[resolve] command not found: %s\n", cmd); 
+                }
+            }
+        }
 
 		free(input);
 		free_tokens(tokens);
