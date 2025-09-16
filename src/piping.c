@@ -22,7 +22,7 @@ void cleanProcesses(int* processes , int processCount , int** pipes , int pipesC
 //the array commands contains the commands to be executed with piping in order , num commnads in the number of them
 //WILL NEED TO MODIFY TO SUPPORT BACHGROUND PROCESSES
 //args is a 2-d array of arguments to the respective commands. empty array if none. same length as commands
-int createChildProcesses(char* commands , int numCommands , char** args) {
+int createChildProcesses(char** commands , const int numCommands , char*** args) {
     
     int* processIds = (int*) malloc(sizeof(int) * (numCommands));
 
