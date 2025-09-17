@@ -7,10 +7,9 @@
 
 int main()
 {
-	prompt();
+	
 	while (1) {
-		printf("> ");
-
+		prompt();
 		/* input contains the whole command
 		 * tokens contains substrings from input split by spaces
 		 */
