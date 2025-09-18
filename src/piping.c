@@ -1,15 +1,9 @@
 #include <stdio.h>
 #include <unistd.h>
+#include "piping.h"
 #include <sys/types.h>
+#include <sys/wait.h>
 #include <stdlib.h>
-
-//placeholder for crearting new processes - we may want other logic
-int newProcess() {
-
-    int newProcess = fork();
-
-    return newProcess;
-}
 
 //placeholder for cleaning memory associated with this code
 //pipes is assumed to take the form int[ int[2] , int[2] ]
@@ -25,37 +19,76 @@ void cleanProcesses(int* processes , int processCount , int** pipes , int pipesC
 }
 
 //returns pointer to array of child pids
-int* createChildProcesses( int numProcesses) {
+//the array commands contains the commands to be executed with piping in order , num commnads in the number of them
+//WILL NEED TO MODIFY TO SUPPORT BACHGROUND PROCESSES
+//args is a 2-d array of arguments to the respective commands. empty array if none. same length as commands
+int createChildProcesses(char** commands , const int numCommands , char*** args) {
     
-    int* processIds = (int*) malloc(sizeof(int) * numProcesses);
+    int* processIds = (int*) malloc(sizeof(int) * (numCommands));
 
-    for( int i = 0 ; i < numProcesses ; i++) {
+    int** processPipes = createPipes(numCommands); //has number of pipes needed for communication
+    int numPipes = sizeof(processPipes) / sizeof(int);
+
+    for( int i = 0 ; i < (numCommands) ; i++) {
         
-        int processId = newProcess();
-
-        if(processId == 0 ) {
-            return NULL;
-        }
+        int processId = fork();
 
         if(processId < 0){
             fprintf(stderr , "unable to execute command exiting...");
             exit(1); //it failed - ooooooooooof
         }
+
+        if(processId == 0 ) { //inside child process
+            
+            //execute commands as needed
+
+            if( i == 0 ) {
+
+                dup2(processPipes[0][1] , STDOUT_FILENO); //replace stdout with write end of pipe
+
+                //first subproces now has write end of pipe as stdout
+            }
+            else if( i == numCommands - 1) { //last command goes to stdout EDIT TO SUPPORT REDIRECTS MAYBE
+
+                dup2(processPipes[ i - 1][0] , STDIN_FILENO); //takes input from previous command
+
+                //final subprocess now takes input from previous process and puts it to stdin
+            }
+            else { //any inbetween
+                dup2(processPipes[ i - 1][0] , STDIN_FILENO); //takes input from previous
+                dup2(processPipes[i][1] , STDOUT_FILENO); //puts output to next
+            }
+
+            execv(commands[i] , args[i] );
+
+        }
+        else { //inside parent
+            
+            //await completion
+        }
         
         processIds[i] = processId;
     }
 
-    return processIds;
+    for(int i = 0 ; i < numCommands ; i++) {
+        waitpid(processIds[i] , NULL ,  0);
+    }
+
+    //free allocated memory
+    cleanProcesses(processIds , numCommands , processPipes , numPipes);
+
+    return 1;
 
 }
 
-//returns pointer to array of 2 element arrays - MUST FREE ALL ARRAY SLOTS AND THEN FREE TOPLEVEL ARRAY ON DESTROY
-//the array is all of the 
-int** createIoBuffers(int numProcesses) {
-    
+//do not call inside child
+//must free return value of function when done
+int** createPipes( int numProcesses) { //for n procecesses we need n-1 pipes
+
+    //assumed to be inside parent process
     int** processes = (int**) malloc((numProcesses - 1) * sizeof(int*));
 
-    for( int i = 0 ; i < numProcesses - 1 ; i++){
+    for( int i = 0 ; i < numProcesses - 1 ; i++){ //
 
         processes[i] = (int*) malloc(2 * sizeof(int));
 
@@ -67,24 +100,7 @@ int** createIoBuffers(int numProcesses) {
         }
     }
 
-    return processes;
-}
-
-//assumes we are inside a child process - DO NOT CALL IN PARENT , or do idk im not ur mom
-//returns an array of pipes - each pipe is an array of 2 ints
-int** createPipes( int* processIds , int idsLength) {
-
-    for( int i = 0 ; i < idsLength ; i++) {
-        
-        if(processIds[i] != 0) { //inside parent
-            return NULL;
-        }
-    }
-
-    //assumed to be inside child process
-
     //returns an array of buffers of the length needed to link the processes together
-    int** buffers = createIoBuffers(idsLength);
 
-    return buffers;
+    return processes;
 }
