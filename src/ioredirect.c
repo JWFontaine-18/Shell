@@ -86,6 +86,7 @@ int redirectInput( char** input , int inputLength) {
 }
 
 //expects commands to be in order of input
+//expects first element in input to be a command
 struct redirectCommand** parseInput(char** input , int inputLength , int numCommands) {
 
     //we use an array of structs as a placeholder in case we need to support multiple commands
@@ -117,7 +118,7 @@ struct redirectCommand** parseInput(char** input , int inputLength , int numComm
 
         if( strcmp(input[i], ">") == 0 || strcmp(input[i] , "<") == 0 ) {
 
-            if(i >= inputLength) { //error state
+            if(i + 1 >= inputLength) { //error state
                 return NULL;
             }
 
