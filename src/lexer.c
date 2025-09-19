@@ -11,15 +11,17 @@
 
 int main()
 {
-	prompt();
+
 	while (1) {
-		printf("> ");
+		prompt();
+		//printf("> ");
 
 		/* input contains the whole command
 		 * tokens contains substrings from input split by spaces
 		 */
 
 		char *input = get_input();
+
 		printf("whole input: %s\n", input);
 
 		tokenlist *tokens = get_tokens(input);
