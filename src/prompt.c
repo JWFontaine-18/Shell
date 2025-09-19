@@ -33,8 +33,10 @@ void prompt() {
 
     printf("%s@%s:%s> ", name, machine, env);
 
-    char input[1024];
-    fgets(input, sizeof(input), stdin);
+
+    //THESE SHOULD NOT BE HERE - HUGH
+    //char input[1024];
+    //fgets(input, sizeof(input), stdin);
 }
 
 /*
