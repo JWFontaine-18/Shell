@@ -1,8 +1,10 @@
 #ifndef REDIRECT_H
 #define REDIRECT_H
 
-void cleanRedirect();
-int redirectInput(const char** input , int inputLength);
-struct redirectCommnad** parseInput(char** input);
+struct redirectCommand;
+void freeRedirectCommand(struct redirectCommand* comm);
+void cleanRedirect(struct redirectCommand** redirects , int redirectsLength);
+int redirectInput(char** input , int inputLength);
+struct redirectCommand** parseInput(char** input , int inputLength , int numCommands);
 
 #endif

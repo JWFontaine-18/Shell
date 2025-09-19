@@ -1,9 +1,12 @@
 #include "command_utils.h"
+#include "redirect.h"
 #include "stdlib.h"
 #include "stdio.h"
 #include <sys/types.h>
 #include <sys/wait.h>
+#include <string.h>
 #include <unistd.h>
+#include <fcntl.h>
 
 //allows redirect commands to be in defined format
 struct redirectCommand {
@@ -19,14 +22,17 @@ void freeRedirectCommand(struct redirectCommand* comm) {
 }
 
 //free allocated memory
-void cleanRedirect() {
+void cleanRedirect(struct redirectCommand** redirects , int redirectsLength) {
 
+    for(int i = 0 ; i < redirectsLength ; i++) {
+        freeRedirectCommand(redirects[i]);
+    }
 }
 
 //you can just pass the direct command sequence here - we will parse it
 //we do assume it has at least ONE I/O redirect in it tho
 //we will validate command structure
-int redirectInput(const char** input , int inputLength) {
+int redirectInput( char** input , int inputLength) {
 
     int numCommands = 1; //TODO make accurate
     struct redirectCommand** redirects = parseInput(input , inputLength , numCommands);
@@ -38,7 +44,7 @@ int redirectInput(const char** input , int inputLength) {
         int procId = fork();
 
         if(procId < 0) {
-            printf('fatal error executing command');
+            printf("fatal error executing command");
             exit(1);
         }
         else if(procId == 0 ) { //inside child
@@ -46,9 +52,9 @@ int redirectInput(const char** input , int inputLength) {
             int infileDesc = -1;
             int outfileDesc = -1;
 
-            if(command->infilePath) {
+            if(command->infilePath != NULL) {
 
-                infileDesc = fopen(command->infilePath , "r"); //TODO: error if file does not exist
+                infileDesc = open(command->infilePath , O_RDONLY); //TODO: error if file does not exist
 
                 //TODO: error check
 
@@ -56,9 +62,9 @@ int redirectInput(const char** input , int inputLength) {
                 
             }
 
-            if(command->outfilePath) {
+            if(command->outfilePath != NULL) {
                 
-                outfileDesc = fopen(command->outfilePath , 'w');
+                outfileDesc = open(command->outfilePath , (O_WRONLY | O_CREAT | O_TRUNC) , (S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH) );
 
                 //TODO: error check
 
@@ -70,9 +76,12 @@ int redirectInput(const char** input , int inputLength) {
         }
         else {
             waitpid(procId , NULL , 0); //TODO: refactor for background execution
+            cleanRedirect(redirects , numCommands); //free mem
         }
         
     }
+
+    return 1; //TODO: adjust for background proccessing
     
 }
 
@@ -80,7 +89,7 @@ int redirectInput(const char** input , int inputLength) {
 struct redirectCommand** parseInput(char** input , int inputLength , int numCommands) {
 
     //we use an array of structs as a placeholder in case we need to support multiple commands
-    struct redirectCommand** redirectCommands = (struct redirectCommand*) malloc(sizeof( struct redirectCommand* ) * numCommands);
+    struct redirectCommand** redirectCommands = (struct redirectCommand**) malloc(sizeof( struct redirectCommand* ) * numCommands);
     char* firstCommandPath;
 
     for( int i = 0 ; i < numCommands ; i++) { //initialize commands with empty structs
@@ -106,13 +115,13 @@ struct redirectCommand** parseInput(char** input , int inputLength , int numComm
             continue;
         }
 
-        if(input[i] == '>' || input[i] == '<') {
+        if( strcmp(input[i], ">") == 0 || strcmp(input[i] , "<") == 0 ) {
 
             if(i >= inputLength) { //error state
                 return NULL;
             }
 
-            if(input[i] == '>') { //TODO: logic here breaks if i add a > || < at the end of input
+            if(strcmp(input[i], ">") == 0) { //TODO: logic here breaks if i add a > || < at the end of input
                 
                 i++;
 
@@ -120,7 +129,7 @@ struct redirectCommand** parseInput(char** input , int inputLength , int numComm
 
                 i++;
             }
-            else if(input[i] == '<') {
+            else if(strcmp(input[i] , "<") == 0) {
 
                 i++;
 
@@ -130,4 +139,6 @@ struct redirectCommand** parseInput(char** input , int inputLength , int numComm
             }
         }
     }
+
+    return redirectCommands;
 }
