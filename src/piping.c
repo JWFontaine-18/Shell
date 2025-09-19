@@ -71,7 +71,7 @@ int createChildProcesses(char** commands , const int numCommands , char*** args)
     }
 
     for(int i = 0 ; i < numCommands ; i++) {
-        waitpid(processIds[i] , NULL ,  0);
+        waitpid(processIds[i] , NULL ,  0); //TODO: WILL NEED TO EXPAND FOR BACKGROUND PROC
     }
 
     //free allocated memory

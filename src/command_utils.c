@@ -21,7 +21,8 @@ int command_exists(const char *cmd) {
 }
 
  // Return path to a command or NULL.
- 
+
+ //CALLER MUST FREE
 char *get_command_path(const char *cmd) {
     if (!cmd || *cmd == '\0') return NULL;
 
