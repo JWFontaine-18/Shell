@@ -1,5 +1,10 @@
 #include "ExternalCommand.h"
-#include "path_search.h"
+#include <stdlib.h>
+#include <string.h>
+#include <stdio.h> 
+#include <unistd.h> // Required for fork()
+#include <sys/types.h> // Required for pid_t (process ID type)
+#include <sys/wait.h> // Required for wait() or waitpid()
 
 void ExternalCommand(tokenlist * tokens) {
     if (tokens->size > 0 && tokens->items[0]) {                     
