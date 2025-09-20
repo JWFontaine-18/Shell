@@ -1,0 +1,9 @@
+total 28
+drwxrwxr-x 2 hugh hugh 4096 Sep 19 22:31 bin
+-rw-rw-r-- 1 hugh hugh    4 Sep 19 21:18 in
+drwxrwxr-x 2 hugh hugh 4096 Sep 19 19:53 include
+-rw-rw-r-- 1 hugh hugh  532 Sep 19 19:25 Makefile
+drwxrwxr-x 2 hugh hugh 4096 Sep 19 22:31 obj
+-rw-r--r-- 1 hugh hugh    0 Sep 19 22:32 out
+-rw-rw-r-- 1 hugh hugh 3197 Sep 15 18:52 README.md
+drwxrwxr-x 2 hugh hugh 4096 Sep 19 19:53 src

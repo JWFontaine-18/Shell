@@ -5,7 +5,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>  
-#include <unistd.h>        	  
+#include <unistd.h>  
+#include <redirect.h>      	  
 #include <sys/wait.h>        
 #include <errno.h>           
 
@@ -58,13 +59,35 @@ int main()
                     // If it's a built-in we print nothing here; if not found in PATH, say so.
                     if (strchr(cmd, '/') == NULL)                 
                         printf("[resolve] command not found: %s\n", cmd); 
+						continue;
                 }
             }
         }
 
-        //External command execution
-		ExternalCommand(tokens);
-         
+		int hasPiping = 0;
+		int hasRedirects = 0;
+
+		for(int i = 0 ; i < tokens->size ; i++) {
+			if(strcmp(tokens->items[i] , "<" ) == 0 || strcmp(tokens->items[i] , ">") == 0) {
+				hasRedirects = 1;
+			}
+
+			if(strcmp(tokens->items[i] , "|") == 0) {
+				hasPiping = 1;
+			}
+		}
+
+		if(hasPiping) {
+			printf("pipes!");
+			
+		}
+		else if (hasRedirects) {
+			redirectInput(tokens->items , tokens->size);
+		}
+		else {
+        	//External command execution
+			ExternalCommand(tokens);
+		}
 
 		free(input);
 		free_tokens(tokens);

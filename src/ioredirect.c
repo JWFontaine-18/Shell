@@ -12,14 +12,12 @@
 //allows redirect commands to be in defined format
 struct redirectCommand {
     char* command;
-    char* infilePath;
-    char* outfilePath;
+    char* infilePath; //freed by caller - derived from caLLLER
+    char* outfilePath; //freed by caller - derived from caller
 };
 
 void freeRedirectCommand(struct redirectCommand* comm) {
-    free(comm->command);
-    free(comm->infilePath);
-    free(comm->outfilePath);
+    if(comm->command != NULL) free(comm->command);
 }
 
 //free allocated memory
@@ -28,6 +26,9 @@ void cleanRedirect(struct redirectCommand** redirects , int redirectsLength) {
     for(int i = 0 ; i < redirectsLength ; i++) {
         freeRedirectCommand(redirects[i]);
     }
+
+    free(redirects);
+
 }
 
 //you can just pass the direct command sequence here - we will parse it
@@ -41,6 +42,34 @@ int redirectInput( char** input , int inputLength) {
     for( int i = 0 ; i < numCommands ; i++) { //TODO: generalize and make work
 
         struct redirectCommand* command = redirects[i];
+
+        char** args = (char**) malloc(sizeof(char**) * inputLength);
+        int argCount = 0;
+
+        args[0] = (char*) malloc(sizeof(char) * strlen(input[0]) + 1);
+        strcpy(args[0] , input[0]);
+
+        for(int j = 0 ; j < inputLength ; j++) { //TODO: BAD
+
+            if(j == 0) {
+                argCount++;
+                continue;
+            }
+
+            if(strcmp(input[j], ">") == 0 || strcmp(input[j] , "<") == 0 || strcmp(input[j] , "|") == 0) {
+                j++;
+                continue;
+            }
+
+            args[argCount] = (char*) malloc(sizeof(char) * strlen(input[j]) + 1);
+
+            args[argCount] = strcpy(args[argCount] , input[j]);
+
+            argCount++;
+        }
+
+        args[argCount] = NULL;
+        args = realloc(args , ( argCount * sizeof(char**) ) + 1);
 
         int procId = fork();
 
@@ -60,24 +89,34 @@ int redirectInput( char** input , int inputLength) {
                 //TODO: error check
 
                 dup2(infileDesc , STDIN_FILENO);
+
                 
             }
 
             if(command->outfilePath != NULL) {
                 
-                outfileDesc = open(command->outfilePath , (O_WRONLY | O_CREAT | O_TRUNC) , (S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH) );
+                outfileDesc = open(command->outfilePath , O_WRONLY | O_CREAT | O_TRUNC , S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH );
 
                 //TODO: error check
 
                 dup2(outfileDesc , STDOUT_FILENO);
+
             }
 
-            execv(command->command , NULL);
+            execv(command->command , args);
             
         }
         else {
             waitpid(procId , NULL , 0); //TODO: refactor for background execution
             cleanRedirect(redirects , numCommands); //free mem
+            for(int c = 0 ; c < argCount ; c++) {
+                printf("%s\n", args[c]); 
+            }
+            for(int c = 0 ; c < argCount ; c++) {
+                free(args[c]);
+            }
+
+            free(args);
         }
         
     }
@@ -94,6 +133,7 @@ struct redirectCommand** parseInput(char** input , int inputLength , int numComm
     struct redirectCommand** redirectCommands = (struct redirectCommand**) malloc(sizeof( struct redirectCommand* ) * numCommands);
     char* firstCommandPath;
 
+
     for( int i = 0 ; i < numCommands ; i++) { //initialize commands with empty structs
         redirectCommands[i] = (struct redirectCommand*) malloc(sizeof(struct redirectCommand));
         redirectCommands[i]->command = NULL;
@@ -106,6 +146,7 @@ struct redirectCommand** parseInput(char** input , int inputLength , int numComm
         exit(1);
     }
 
+
     firstCommandPath = get_command_path(input[0]); //first argument should be a command
 
     //TODO: generalize
@@ -116,6 +157,7 @@ struct redirectCommand** parseInput(char** input , int inputLength , int numComm
         if( i == 0){
             continue;
         }
+
 
         if( strcmp(input[i], ">") == 0 || strcmp(input[i] , "<") == 0 ) {
 
@@ -139,6 +181,8 @@ struct redirectCommand** parseInput(char** input , int inputLength , int numComm
 
                 i++;
             }
+        }
+        else {
         }
     }
 
