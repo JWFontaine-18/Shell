@@ -46,8 +46,9 @@ int redirectInput( char** input , int inputLength) {
         char** args = (char**) malloc(sizeof(char**) * inputLength);
         int argCount = 0;
 
-        args[0] = (char*) malloc(sizeof(char) * strlen(input[0]) + 1);
-        strcpy(args[0] , input[0]);
+        args[0] = (char*) malloc(sizeof(char) * strlen(get_command_path(input[0])) + 1);
+
+        strcpy(args[0] , get_command_path(input[0]));
 
         for(int j = 0 ; j < inputLength ; j++) { //TODO: BAD
 
@@ -69,7 +70,7 @@ int redirectInput( char** input , int inputLength) {
         }
 
         args[argCount] = NULL;
-        args = realloc(args , ( argCount * sizeof(char**) ) + 1);
+        args = realloc(args , ( argCount * sizeof(char**) ));
 
         int procId = fork();
 
@@ -107,11 +108,11 @@ int redirectInput( char** input , int inputLength) {
             
         }
         else {
+            
             waitpid(procId , NULL , 0); //TODO: refactor for background execution
+
             cleanRedirect(redirects , numCommands); //free mem
-            for(int c = 0 ; c < argCount ; c++) {
-                printf("%s\n", args[c]); 
-            }
+
             for(int c = 0 ; c < argCount ; c++) {
                 free(args[c]);
             }
