@@ -2,13 +2,15 @@
 #include "prompt.h"
 #include "path_search.h"
 #include "ExternalCommand.h"
+#include "command_utils.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>  
 #include <unistd.h>  
 #include <redirect.h>      	  
 #include <sys/wait.h>        
-#include <errno.h>           
+#include <errno.h>      
+#include "piping.h"     
 
 int main()
 {
@@ -78,7 +80,8 @@ int main()
 		}
 
 		if(hasPiping) {
-			printf("pipes!");
+			
+			
 			
 		}
 		else if (hasRedirects) {

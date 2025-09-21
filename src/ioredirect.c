@@ -25,6 +25,8 @@ void cleanRedirect(struct redirectCommand* redirects) {
 
     freeRedirectCommand(redirects);
 
+
+    free(redirects);
 }
 
 //you can just pass the direct command sequence here - we will parse it

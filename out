@@ -1,1 +1,11 @@
-lh
+total 32K
+-rw-rw-r-- 1 hugh hugh    0 Sep 20 23:30 a.out
+drwxrwxr-x 2 hugh hugh 4.0K Sep 20 23:50 bin
+-rw-rw-r-- 1 hugh hugh    3 Sep 20 22:20 in
+drwxrwxr-x 2 hugh hugh 4.0K Sep 20 22:20 include
+-rw-rw-r-- 1 hugh hugh  532 Sep 19 19:25 Makefile
+drwxrwxr-x 2 hugh hugh 4.0K Sep 20 23:50 obj
+-rw-r--r-- 1 hugh hugh   38 Sep 20 23:36 oout
+-rw-r--r-- 1 hugh hugh    0 Sep 20 23:50 out
+-rw-rw-r-- 1 hugh hugh 3.2K Sep 15 18:52 README.md
+drwxrwxr-x 2 hugh hugh 4.0K Sep 20 22:20 src
