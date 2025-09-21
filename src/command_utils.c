@@ -2,6 +2,7 @@
 #include "command_utils.h"
 #include "path_search.h"
 #include <stdlib.h>
+#include <string.h>
 
 
 // Return 1 if a command exists and is executable.
@@ -29,4 +30,43 @@ char *get_command_path(const char *cmd) {
     if (is_builtin(cmd)) return NULL;
 
     return search_path_for_command(cmd);  // may be NULL
+}
+
+char** getArgs(char** input , int inputLength) {
+
+    char** args = (char**) malloc(sizeof(char*) * inputLength);
+
+    args[0] = (char*) malloc(sizeof(char) * strlen(input[0]) + 1);
+
+    strcpy(args[0] , input[0]);
+
+    int argCount = 1;
+
+    for(int j = 0 ; j < inputLength ; j++) { //TODO: BAD
+
+        if(j == 0) {
+            continue;
+        }
+
+        if(strcmp(input[j], ">") == 0 || strcmp(input[j] , "<") == 0 || strcmp(input[j] , "|") == 0) {
+            j++;
+            continue;
+        }
+
+        int len = strlen(input[j]) + 1;
+
+        args[argCount] = (char*) malloc(sizeof(char) * (len));
+
+        strcpy(args[argCount] , input[j]);
+
+        argCount++;
+    }
+
+    args[argCount] = NULL;
+
+    for(int i = argCount + 1 ; i < inputLength ; i++) {
+        args[i] = NULL;
+    }
+
+    return args;
 }

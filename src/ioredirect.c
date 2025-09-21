@@ -17,17 +17,13 @@ struct redirectCommand {
 };
 
 void freeRedirectCommand(struct redirectCommand* comm) {
-    if(comm->command != NULL) free(comm->command);
+    free(comm->command);
 }
 
 //free allocated memory
-void cleanRedirect(struct redirectCommand** redirects , int redirectsLength) {
+void cleanRedirect(struct redirectCommand* redirects) {
 
-    for(int i = 0 ; i < redirectsLength ; i++) {
-        freeRedirectCommand(redirects[i]);
-    }
-
-    free(redirects);
+    freeRedirectCommand(redirects);
 
 }
 
@@ -37,89 +33,56 @@ void cleanRedirect(struct redirectCommand** redirects , int redirectsLength) {
 int redirectInput( char** input , int inputLength) {
 
     int numCommands = 1; //TODO make accurate
-    struct redirectCommand** redirects = parseInput(input , inputLength , numCommands);
+    struct redirectCommand* command = parseInput(input , inputLength , numCommands);
 
-    for( int i = 0 ; i < numCommands ; i++) { //TODO: generalize and make work
+    char** args = getArgs(input , inputLength);
 
-        struct redirectCommand* command = redirects[i];
+    int procId = fork();
 
-        char** args = (char**) malloc(sizeof(char**) * inputLength);
-        int argCount = 0;
+    if(procId < 0) {
+        printf("fatal error executing command");
+        exit(1);
+    }
+    else if(procId == 0 ) { //inside child
 
-        args[0] = (char*) malloc(sizeof(char) * strlen(get_command_path(input[0])) + 1);
+        int infileDesc = -1;
+        int outfileDesc = -1;
 
-        strcpy(args[0] , get_command_path(input[0]));
+        if(command->infilePath != NULL) {
 
-        for(int j = 0 ; j < inputLength ; j++) { //TODO: BAD
+            infileDesc = open(command->infilePath , O_RDONLY); //TODO: error if file does not exist
 
-            if(j == 0) {
-                argCount++;
-                continue;
-            }
+            //TODO: error check
 
-            if(strcmp(input[j], ">") == 0 || strcmp(input[j] , "<") == 0 || strcmp(input[j] , "|") == 0) {
-                j++;
-                continue;
-            }
+            dup2(infileDesc , STDIN_FILENO);
 
-            args[argCount] = (char*) malloc(sizeof(char) * strlen(input[j]) + 1);
-
-            args[argCount] = strcpy(args[argCount] , input[j]);
-
-            argCount++;
-        }
-
-        args[argCount] = NULL;
-        args = realloc(args , ( argCount * sizeof(char**) ));
-
-        int procId = fork();
-
-        if(procId < 0) {
-            printf("fatal error executing command");
-            exit(1);
-        }
-        else if(procId == 0 ) { //inside child
-
-            int infileDesc = -1;
-            int outfileDesc = -1;
-
-            if(command->infilePath != NULL) {
-
-                infileDesc = open(command->infilePath , O_RDONLY); //TODO: error if file does not exist
-
-                //TODO: error check
-
-                dup2(infileDesc , STDIN_FILENO);
-
-                
-            }
-
-            if(command->outfilePath != NULL) {
-                
-                outfileDesc = open(command->outfilePath , O_WRONLY | O_CREAT | O_TRUNC , S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH );
-
-                //TODO: error check
-
-                dup2(outfileDesc , STDOUT_FILENO);
-
-            }
-
-            execv(command->command , args);
             
         }
-        else {
+
+        if(command->outfilePath != NULL) {
             
-            waitpid(procId , NULL , 0); //TODO: refactor for background execution
+            outfileDesc = open(command->outfilePath , O_WRONLY | O_CREAT | O_TRUNC , S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH );
 
-            cleanRedirect(redirects , numCommands); //free mem
+            //TODO: error check
 
-            for(int c = 0 ; c < argCount ; c++) {
-                free(args[c]);
-            }
+            dup2(outfileDesc , STDOUT_FILENO);
 
-            free(args);
         }
+
+        execv(command->command , args);
         
+    }
+    else {
+        
+        waitpid(procId , NULL , 0); //TODO: refactor for background execution
+
+        cleanRedirect(command); //free mem
+
+        for(int i = 0 ; i < inputLength ; i++) {
+            free(args[i]);
+        }
+
+        free(args);
     }
 
     return 1; //TODO: adjust for background proccessing
@@ -128,19 +91,15 @@ int redirectInput( char** input , int inputLength) {
 
 //expects commands to be in order of input
 //expects first element in input to be a command
-struct redirectCommand** parseInput(char** input , int inputLength , int numCommands) {
+struct redirectCommand* parseInput(char** input , int inputLength , int numCommands) {
 
     //we use an array of structs as a placeholder in case we need to support multiple commands
-    struct redirectCommand** redirectCommands = (struct redirectCommand**) malloc(sizeof( struct redirectCommand* ) * numCommands);
+    struct redirectCommand* redirectCommand = (struct redirectCommand*) malloc(sizeof( struct redirectCommand ) * 1);
     char* firstCommandPath;
 
-
-    for( int i = 0 ; i < numCommands ; i++) { //initialize commands with empty structs
-        redirectCommands[i] = (struct redirectCommand*) malloc(sizeof(struct redirectCommand));
-        redirectCommands[i]->command = NULL;
-        redirectCommands[i]->infilePath = NULL;
-        redirectCommands[i]->outfilePath = NULL;
-    }
+    redirectCommand->command = NULL;
+    redirectCommand->infilePath = NULL;
+    redirectCommand->outfilePath = NULL;
 
     if(!command_exists(input[0])) {
         printf("fatal parse error"); //we should never get here, it is expected that input contains a starting command when passed
@@ -151,7 +110,7 @@ struct redirectCommand** parseInput(char** input , int inputLength , int numComm
     firstCommandPath = get_command_path(input[0]); //first argument should be a command
 
     //TODO: generalize
-    redirectCommands[0]->command = firstCommandPath;
+    redirectCommand->command = firstCommandPath;
 
     for(int i = 0 ; i < inputLength ; i++) { //assumes only one command in the pipe for now TODO: expand
         
@@ -170,23 +129,18 @@ struct redirectCommand** parseInput(char** input , int inputLength , int numComm
                 
                 i++;
 
-                redirectCommands[0]->outfilePath = input[i]; //TODO: make support multiple commands
+                redirectCommand->outfilePath = input[i]; //TODO: make support multiple commands
 
-                i++;
             }
             else if(strcmp(input[i] , "<") == 0) {
 
                 i++;
 
-                redirectCommands[0]->infilePath = input[i]; //TODO: make support multiple commands
-
-                i++;
+                redirectCommand->infilePath = input[i]; //TODO: make support multiple commands
             }
-        }
-        else {
         }
     }
 
-    return redirectCommands;
+    return redirectCommand;
 }
 

@@ -10,3 +10,8 @@ int command_exists(const char *cmd);
   Returns NULL if not found.
   Caller must free the returned string. */
 char *get_command_path(const char *cmd);
+
+
+//returns arguments to a command in the style execv expects of length input length
+//unused slots are NULL
+char** getArgs(char** input , int inputLength); 

@@ -3,8 +3,8 @@
 
 struct redirectCommand;
 void freeRedirectCommand(struct redirectCommand* comm);
-void cleanRedirect(struct redirectCommand** redirects , int redirectsLength);
+void cleanRedirect(struct redirectCommand* redirects);
 int redirectInput(char** input , int inputLength);
-struct redirectCommand** parseInput(char** input , int inputLength , int numCommands);
+struct redirectCommand* parseInput(char** input , int inputLength , int numCommands);
 
 #endif
