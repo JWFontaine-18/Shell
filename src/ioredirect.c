@@ -56,6 +56,10 @@ int redirectInput( char** input , int inputLength) {
 
             //TODO: error check
 
+            if(infileDesc == -1) { //error case
+                _exit(5); //exit child process
+            }
+
             dup2(infileDesc , STDIN_FILENO);
 
             
@@ -76,7 +80,15 @@ int redirectInput( char** input , int inputLength) {
     }
     else {
         
-        waitpid(procId , NULL , 0); //TODO: refactor for background execution
+        int* processStat = (int*) malloc(sizeof(int));
+
+        waitpid(procId , processStat , 0); //TODO: refactor for background execution
+
+        if(WEXITSTATUS(*processStat) == 5) {
+            printf("Error: unknown file or directory\n");
+        }
+
+        free(processStat);
 
         cleanRedirect(command); //free mem
 

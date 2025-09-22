@@ -81,7 +81,52 @@ int main()
 
 		if(hasPiping) {
 			
-			
+			int numCommands = 0;
+			int numArgs = tokens->size;
+			char** commands = (char**) malloc(sizeof(char*) * tokens->size); //array of strings, each one is a command
+			char*** args = (char***) malloc(sizeof(char**) * numArgs); //array of array of strings in format execv expects
+
+			for(int k = 0 ; k < numArgs ; k++) {
+				args[k] = NULL;
+			}
+
+			for(int i = 0 ; i < tokens->size ; i++) {
+				
+				if( i == 0 ) {
+					commands[i] = tokens->items[i];
+					numCommands++;
+
+					/*int numArgs = 0; 
+
+					for( int j = i ; j < tokens->size ; j++) { //get count of all arguments for command
+						
+						if( strcmp(tokens->items[j] , "|") == 0 ) {
+							break;
+						}
+
+						numArgs++;
+
+					}
+
+					args[0] = (char**) malloc(sizeof(char*) * numArgs);*/
+
+					continue;
+				}
+
+				if(strcmp(tokens->items[i] , "|") == 0 ) { //next token is command assumed
+					
+					commands[numCommands] = tokens->items[i + 1];
+					numCommands++;
+				}
+
+			}
+
+			for( int n = 0 ; n < numCommands ; n++) {
+				printf("%s\n" , commands[n]);
+			}
+
+
+			createChildProcesses(commands , numCommands , args);
 			
 		}
 		else if (hasRedirects) {
@@ -91,6 +136,7 @@ int main()
         	//External command execution
 			ExternalCommand(tokens);
 		}
+
 
 		free(input);
 		free_tokens(tokens);

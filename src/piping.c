@@ -27,7 +27,7 @@ int createChildProcesses(char** commands , const int numCommands , char*** args)
     int* processIds = (int*) malloc(sizeof(int) * (numCommands));
 
     int** processPipes = createPipes(numCommands); //has number of pipes needed for communication
-    int numPipes = sizeof(processPipes) / sizeof(int);
+    int numPipes = numCommands - 1;
 
     for( int i = 0 ; i < (numCommands) ; i++) {
         
@@ -60,7 +60,6 @@ int createChildProcesses(char** commands , const int numCommands , char*** args)
             }
 
             execv(commands[i] , args[i] );
-
         }
         else { //inside parent
             

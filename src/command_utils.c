@@ -32,13 +32,15 @@ char *get_command_path(const char *cmd) {
     return search_path_for_command(cmd);  // may be NULL
 }
 
+//returns array of length inputLength in format that execv expects - unused slots are NULL
+//Must be freed by caller
 char** getArgs(char** input , int inputLength) {
 
     char** args = (char**) malloc(sizeof(char*) * inputLength);
 
-    args[0] = (char*) malloc(sizeof(char) * strlen(input[0]) + 1);
+    char* commandPath = get_command_path(input[0]);
 
-    strcpy(args[0] , input[0]);
+    args[0] = commandPath;
 
     int argCount = 1;
 
