@@ -43,15 +43,13 @@ int createChildProcesses(char** commands , const int numCommands , char*** args)
             //execute commands as needed
 
             if( i == 0 ) {
-
                 dup2(processPipes[0][1] , STDOUT_FILENO); //replace stdout with write end of pipe
 
                 //first subproces now has write end of pipe as stdout
             }
             else if( i == numCommands - 1) { //last command goes to stdout EDIT TO SUPPORT REDIRECTS MAYBE
-
+                
                 dup2(processPipes[ i - 1][0] , STDIN_FILENO); //takes input from previous command
-
                 //final subprocess now takes input from previous process and puts it to stdin
             }
             else { //any inbetween
@@ -59,7 +57,8 @@ int createChildProcesses(char** commands , const int numCommands , char*** args)
                 dup2(processPipes[i][1] , STDOUT_FILENO); //puts output to next
             }
 
-            execv(commands[i] , args[i] );
+            //execv(commands[i] , args[i] );
+            execv(commands[i] , NULL );
         }
         else { //inside parent
             
@@ -70,6 +69,7 @@ int createChildProcesses(char** commands , const int numCommands , char*** args)
     }
 
     for(int i = 0 ; i < numCommands ; i++) {
+        printf("%d\n" , processIds[i]);
         waitpid(processIds[i] , NULL ,  0); //TODO: WILL NEED TO EXPAND FOR BACKGROUND PROC
     }
 

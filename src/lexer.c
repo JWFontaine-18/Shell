@@ -93,7 +93,7 @@ int main()
 			for(int i = 0 ; i < tokens->size ; i++) {
 				
 				if( i == 0 ) {
-					commands[i] = tokens->items[i];
+					commands[i] = get_command_path(tokens->items[i]);
 					numCommands++;
 
 					/*int numArgs = 0; 
@@ -115,18 +115,17 @@ int main()
 
 				if(strcmp(tokens->items[i] , "|") == 0 ) { //next token is command assumed
 					
-					commands[numCommands] = tokens->items[i + 1];
+					commands[numCommands] = get_command_path(tokens->items[i + 1]);
 					numCommands++;
 				}
 
 			}
 
-			for( int n = 0 ; n < numCommands ; n++) {
-				printf("%s\n" , commands[n]);
-			}
-
-
 			createChildProcesses(commands , numCommands , args);
+
+			for(int i = 0 ; i < numCommands ; i++) {
+				free(commands[i]);
+			}
 			
 		}
 		else if (hasRedirects) {
