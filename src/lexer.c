@@ -25,26 +25,12 @@ int main()
 
 		char *input = get_input();
 
-		printf("whole input: %s\n", input);
-
 		tokenlist *tokens = get_tokens(input);
-		for (int i = 0; i < tokens->size; i++) {
-			printf("token %d: (%s)\n", i, tokens->items[i]);
-		}
 
 		expand_env_var(tokens);
 
-		for (int i = 0; i < tokens->size; i++) {
-			printf("token %d: (%s)\n", i, tokens->items[i]);
-		}
-
         //turns ~ -> $HOME and ~/dir -> $HOME/dir.
         expand_tilde(tokens);
-
-        //Show tokens again after tilde expansion (debugging stuff)
-        for (int i = 0; i < tokens->size; i++) { 
-            printf("token %d: (%s)\n", i, tokens->items[i]); 
-        }
 
 
         /* [Part 4 - ADDED] PATH search
@@ -54,8 +40,7 @@ int main()
             const char *cmd = tokens->items[0];                   
             if (!is_builtin(cmd)) {                               
                 char *resolved = search_path_for_command(cmd);    
-                if (resolved) {                                   
-                    printf("[resolve] %s\n", resolved);           
+                if (resolved) {                                            
                     free(resolved);                               
                 } else {
                     // If it's a built-in we print nothing here; if not found in PATH, say so.
@@ -82,50 +67,83 @@ int main()
 		if(hasPiping) {
 			
 			int numCommands = 0;
-			int numArgs = tokens->size;
 			char** commands = (char**) malloc(sizeof(char*) * tokens->size); //array of strings, each one is a command
-			char*** args = (char***) malloc(sizeof(char**) * numArgs); //array of array of strings in format execv expects
+			char*** args = (char***) malloc(sizeof(char**) * tokens->size); //array of array of strings in format execv expects
 
-			for(int k = 0 ; k < numArgs ; k++) {
+			for(int k = 0 ; k < tokens->size ; k++) {
 				args[k] = NULL;
 			}
 
+			//get all commands
 			for(int i = 0 ; i < tokens->size ; i++) {
-				
+
+				char* command;
+
 				if( i == 0 ) {
-					commands[i] = get_command_path(tokens->items[i]);
-					numCommands++;
 
-					/*int numArgs = 0; 
+					command = get_command_path(tokens->items[i]);
+					
+					commands[i] = command;
 
-					for( int j = i ; j < tokens->size ; j++) { //get count of all arguments for command
-						
-						if( strcmp(tokens->items[j] , "|") == 0 ) {
-							break;
-						}
-
-						numArgs++;
-
-					}
-
-					args[0] = (char**) malloc(sizeof(char*) * numArgs);*/
+					numCommands++; 
 
 					continue;
 				}
 
 				if(strcmp(tokens->items[i] , "|") == 0 ) { //next token is command assumed
+
+					command = get_command_path(tokens->items[i + 1]);
 					
-					commands[numCommands] = get_command_path(tokens->items[i + 1]);
+					commands[numCommands] = command;
 					numCommands++;
 				}
 
 			}
+
+			//get arguments
+			int startIndex = 0;
+			for(int i = 0 ; i < numCommands ; i++){
+
+				char** argArr = (char**) malloc(sizeof(char*) * tokens->size);
+
+				for(int k = 0 ; k < tokens->size; k++){ //init to null
+					argArr[k] = NULL;
+				}
+
+				for(int k = startIndex ; k < tokens->size ; k++) { //copy arguments
+					
+					startIndex++;
+
+					if(k - startIndex == 0 ) { //use command path as first for execv
+						argArr[k - startIndex] = commands[i];
+						continue;
+					}
+
+					if(strcmp(tokens->items[k] , "|") == 0 ) { //stop when pipe
+						break;
+					}
+
+					argArr[k - startIndex] = tokens->items[k]; //copy reference to arg
+				}
+
+				args[i] = argArr; //arguments for command go in parrallel array
+				
+			}
+
+			for(int i = 0 ; i < tokens->size; i++)
+				printf("%s\n" , args[1][i]);
 
 			createChildProcesses(commands , numCommands , args);
 
 			for(int i = 0 ; i < numCommands ; i++) {
 				free(commands[i]);
 			}
+
+			for(int i = 0 ; i < tokens->size ; i++) {
+				free(args[i]); //all strings themselves are freed at end of loop
+			}
+
+			free(args);
 			
 		}
 		else if (hasRedirects) {

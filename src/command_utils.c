@@ -52,7 +52,7 @@ char** getArgs(char** input , int inputLength) {
 
         if(strcmp(input[j], ">") == 0 || strcmp(input[j] , "<") == 0 || strcmp(input[j] , "|") == 0) {
             j++;
-            continue;
+            break;
         }
 
         int len = strlen(input[j]) + 1;
