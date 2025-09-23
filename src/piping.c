@@ -16,6 +16,8 @@ void createChildProcesses(char** commands , const int numCommands , char*** args
 
     char* arg[2];
 
+    int pids[numCommands]; 
+
 	// create read and write end of pipe
 	pipe(pipes[0]);
 	pipe(pipes[1]);
@@ -30,6 +32,8 @@ void createChildProcesses(char** commands , const int numCommands , char*** args
 
         int pid = fork();
 
+        pids[i] = pid;
+
         if(pid < 0) {
             printf("Error: unable to execute command\n");
             exit(1);
@@ -43,13 +47,15 @@ void createChildProcesses(char** commands , const int numCommands , char*** args
             }
             
             if( i < numCommands - 1) {
+
                 dup2(pipes[i][1] , STDOUT_FILENO);
             }
 
 
-            close(pipes[i][0]);
-            close(pipes[i][1]);
-
+            for(int j = 0 ; j < 2 ; j++) {
+                close(pipes[j][0]);
+                close(pipes[j][1]);
+            }
 
             int success = execv(commands[i] , arg);
 
@@ -59,6 +65,15 @@ void createChildProcesses(char** commands , const int numCommands , char*** args
             }
         }
 
+    }
+
+    for(int j = 0 ; j < 2 ; j++) { //oh my god the parent has to close them too
+        close(pipes[j][0]);
+        close(pipes[j][1]);
+    }
+
+    for(int i = 0 ; i < numCommands ; i++) {
+        waitpid(pids[i] , NULL , 0);
     }
 
     return;
