@@ -93,6 +93,11 @@ int main()
 				if(strcmp(tokens->items[i] , "|") == 0 ) { //next token is command assumed
 
 					command = get_command_path(tokens->items[i + 1]);
+
+					if(command == NULL) {
+						printf("command not found...\n");
+						goto end;
+					}
 					
 					commands[numCommands] = command;
 					numCommands++;
@@ -102,6 +107,7 @@ int main()
 
 			//get arguments
 			int startIndex = 0;
+
 			for(int i = 0 ; i < numCommands ; i++){
 
 				char** argArr = (char**) malloc(sizeof(char*) * tokens->size);
@@ -111,8 +117,6 @@ int main()
 				}
 
 				for(int k = startIndex ; k < tokens->size ; k++) { //copy arguments
-					
-					startIndex++;
 
 					if(k - startIndex == 0 ) { //use command path as first for execv
 						argArr[k - startIndex] = commands[i];
@@ -120,6 +124,7 @@ int main()
 					}
 
 					if(strcmp(tokens->items[k] , "|") == 0 ) { //stop when pipe
+						startIndex = ++k;
 						break;
 					}
 
@@ -130,14 +135,13 @@ int main()
 				
 			}
 
-			for(int i = 0 ; i < tokens->size; i++)
-				printf("%s\n" , args[1][i]);
-
 			createChildProcesses(commands , numCommands , args);
 
-			for(int i = 0 ; i < numCommands ; i++) {
+			end:for(int i = 0 ; i < numCommands ; i++) {
 				free(commands[i]);
 			}
+
+			free(commands);
 
 			for(int i = 0 ; i < tokens->size ; i++) {
 				free(args[i]); //all strings themselves are freed at end of loop
@@ -153,7 +157,6 @@ int main()
         	//External command execution
 			ExternalCommand(tokens);
 		}
-
 
 		free(input);
 		free_tokens(tokens);
