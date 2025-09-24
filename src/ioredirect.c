@@ -57,6 +57,15 @@ int redirectInput( char** input , int inputLength) {
             //TODO: error check
 
             if(infileDesc == -1) { //error case
+                
+                cleanRedirect(command);
+
+                for(int i = 0 ; i < inputLength ; i++) {
+                    free(args[i]);
+                }
+
+                free(args);
+
                 _exit(5); //exit child process
             }
 
