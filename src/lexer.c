@@ -10,14 +10,37 @@
 #include <redirect.h>      	  
 #include <sys/wait.h>        
 #include <errno.h>      
-#include "piping.h"     
+#include "piping.h" 
+#include "background.h"    
 
-int main()
-{
+int main() {
+
+	backgroundProcs backProcs;
+
+	backProcs.numActiveBackgroundProcesses = 0;
+	backProcs.numBackgroundProcessesTotal = 0;
+
+	for(int i = 0 ; i < 10 ; i++) {
+		backProcs.activeBackgroundProcessPIDs[i] = 0;
+		backProcs.activeBackgroundProcessesJobNums[i] = 0;
+	}
 
 	while (1) {
+
+		int status;
+
+		for(int i = 0 ; i < 10; i++) {
+
+			if(backProcs.activeBackgroundProcessPIDs[i] == 0){
+				continue;
+			}
+
+			if(waitpid(backProcs.activeBackgroundProcessPIDs[i] , &status , WNOHANG) > 0) { //process has returned
+				removeBackgroundProcess(&backProcs , backProcs.activeBackgroundProcessesJobNums[i]);
+			}
+		}
+
 		prompt();
-		//printf("> ");
 
 		/* input contains the whole command
 		 * tokens contains substrings from input split by spaces
@@ -53,6 +76,7 @@ int main()
 
 		int hasPiping = 0;
 		int hasRedirects = 0;
+		int sendToBack = 0; //sned current command to background
 
 		for(int i = 0 ; i < tokens->size ; i++) {
 			if(strcmp(tokens->items[i] , "<" ) == 0 || strcmp(tokens->items[i] , ">") == 0) {
@@ -61,6 +85,11 @@ int main()
 
 			if(strcmp(tokens->items[i] , "|") == 0) {
 				hasPiping = 1;
+			}
+
+			if(strcmp(tokens->items[i] , "&") == 0) {
+				sendToBack = 1;
+				removeAmpersand(tokens); //remove special
 			}
 		}
 
@@ -72,7 +101,7 @@ int main()
 		}
 		else {
         	//External command execution
-			ExternalCommand(tokens);
+			ExternalCommand(tokens , &backProcs , sendToBack);
 		}
 
 		free(input);

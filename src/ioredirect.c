@@ -54,8 +54,6 @@ int redirectInput( char** input , int inputLength) {
 
             infileDesc = open(command->infilePath , O_RDONLY); //TODO: error if file does not exist
 
-            //TODO: error check
-
             if(infileDesc == -1) { //error case
                 
                 cleanRedirect(command);

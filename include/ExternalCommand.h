@@ -1,4 +1,6 @@
 #pragma once
 #include "path_search.h"
 #include "lexer.h"
-void ExternalCommand(tokenlist * tokens);
+#include "background.h"
+
+void ExternalCommand(tokenlist * tokens , backgroundProcs* backgroundProcesses , int sendtoBack);
