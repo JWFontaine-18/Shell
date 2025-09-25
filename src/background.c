@@ -39,8 +39,6 @@ void removeBackgroundProcess(backgroundProcs* processes , int jobNum) {
         processes->activeBackgroundProcessesNames[ind]
     );
 
-    printf("index: %d\n" , ind);
-
     free(processes->activeBackgroundProcessesNames[ind]);
     processes->activeBackgroundProcessPIDs[ind] = 0;
     processes->activeBackgroundProcessesJobNums[ind] = 0;
