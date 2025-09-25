@@ -19,6 +19,8 @@ void incrementBackProcs( backgroundProcs* processes , int pid , char* command) {
     processes->activeBackgroundProcessesNames[processes->numBackgroundProcessesTotal % 10] = command;
 }
 
+//simply removes the specified background proccess from record and prints its details to stdout
+//jobNum is the relative jobnum (the counter from start of program)
 void removeBackgroundProcess(backgroundProcs* processes , int jobNum) {
 
     processes->numActiveBackgroundProcesses--;
@@ -44,6 +46,7 @@ void removeBackgroundProcess(backgroundProcs* processes , int jobNum) {
     processes->activeBackgroundProcessesJobNums[ind] = 0;
 }
 
+//adds a background process to the tracker and prints its detailsa to stdout
 void addBackgroundProcess(backgroundProcs* processes , int pid , tokenlist* tokens) {
 
     char* printableCommand = (char*) malloc(sizeof(char) * 200);
@@ -69,6 +72,23 @@ void addBackgroundProcess(backgroundProcs* processes , int pid , tokenlist* toke
     );
 
     printf("\n");
+}
+
+void reportRunningProcess(backgroundProcs* processes , int jobNum) {
+    int ind;
+
+    for(int i = 0 ; i < 10 ; i++) {
+        if(jobNum == processes->activeBackgroundProcessesJobNums[i]) {
+            ind = i;
+        }
+    }
+
+    printf("[%d]  + %d running %s\n" , 
+        processes->activeBackgroundProcessesJobNums[ind] , 
+        processes->activeBackgroundProcessPIDs[ind] , 
+        processes->activeBackgroundProcessesNames[ind]
+    );
+  
 }
 
 //removes an ampersand from the input tokens, do not call if no ampersand present

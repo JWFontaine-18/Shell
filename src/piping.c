@@ -7,13 +7,14 @@
 #include "lexer.h"
 #include <string.h>
 #include "command_utils.h"
+#include "background.h"
 
 
 //returns pointer to array of child pids
 //the array commands contains the commands to be executed with piping in order , num commnads in the number of them
 //WILL NEED TO MODIFY TO SUPPORT BACHGROUND PROCESSES
 //args is a 2-d array of arguments to the respective commands. empty array if none. same length as commands
-void createChildProcesses(char** commands , const int numCommands , char*** args) {
+void createChildProcesses(char** commands , const int numCommands , char*** args , tokenlist* tokens , backgroundProcs* backgroundProcesses , int sendtoBack) {
 
     int pipes[2][2];
 
@@ -69,15 +70,26 @@ void createChildProcesses(char** commands , const int numCommands , char*** args
         close(pipes[j][1]);
     }
 
-    for(int i = 0 ; i < numCommands ; i++) {
-        waitpid(pids[i] , NULL , 0);
+    if(sendtoBack == 0){
+        for(int i = 0 ; i < numCommands ; i++) {
+            waitpid(pids[i] , NULL , 0);
+        }
+    }
+    else {
+
+        for(int i = 0 ; i < numCommands ; i++) {
+            
+            addBackgroundProcess(backgroundProcesses , pids[i] , tokens);
+
+            waitpid(pids[i] , NULL , WNOHANG);
+        }
     }
 
     return;
 
 }
 
-void pipeCommands(tokenlist* tokens) {
+void pipeCommands(tokenlist* tokens , backgroundProcs* backgroundProcesses , int sendtoBack) {
 
     int numCommands = 0;
     char** commands = (char**) malloc(sizeof(char*) * tokens->size); //array of strings, each one is a command
@@ -148,7 +160,7 @@ void pipeCommands(tokenlist* tokens) {
         
     }
 
-    createChildProcesses(commands , numCommands , args);
+    createChildProcesses(commands , numCommands , args , tokens, backgroundProcesses , sendtoBack);
 
     end:for(int i = 0 ; i < numCommands ; i++) {
         free(commands[i]);

@@ -23,4 +23,6 @@ void addBackgroundProcess(backgroundProcs* processes , int pid , tokenlist* toke
 
 void removeBackgroundProcess(backgroundProcs* processes , int jobNum);
 
+void reportRunningProcess(backgroundProcs* processes , int jobNum);
+
 #endif

@@ -8,6 +8,7 @@
 #include <string.h>
 #include <unistd.h>
 #include <fcntl.h>
+#include "background.h"
 
 //allows redirect commands to be in defined format
 struct redirectCommand {
@@ -32,12 +33,12 @@ void cleanRedirect(struct redirectCommand* redirects) {
 //you can just pass the direct command sequence here - we will parse it
 //we do assume it has at least ONE I/O redirect in it tho
 //we will validate command structure
-int redirectInput( char** input , int inputLength) {
+int redirectInput( tokenlist* tokens ,  backgroundProcs* backgroundProcesses , int sendtoBack ) {
 
     int numCommands = 1; //TODO make accurate
-    struct redirectCommand* command = parseInput(input , inputLength , numCommands);
+    struct redirectCommand* command = parseInput(tokens->items , tokens->size , numCommands);
 
-    char** args = getArgs(input , inputLength);
+    char** args = getArgs(tokens->items , tokens->size);
 
     int procId = fork();
 
@@ -58,7 +59,7 @@ int redirectInput( char** input , int inputLength) {
                 
                 cleanRedirect(command);
 
-                for(int i = 0 ; i < inputLength ; i++) {
+                for(int i = 0 ; i < tokens->size ; i++) {
                     free(args[i]);
                 }
 
@@ -89,17 +90,29 @@ int redirectInput( char** input , int inputLength) {
         
         int* processStat = (int*) malloc(sizeof(int));
 
-        waitpid(procId , processStat , 0); //TODO: refactor for background execution
+        if(sendtoBack == 0) {
 
-        if(WEXITSTATUS(*processStat) == 5) {
-            printf("Error: unknown file or directory\n");
+            waitpid(procId , processStat , 0); //TODO: refactor for background execution
+
+            if(WEXITSTATUS(*processStat) == 5) {
+                printf("Error: unknown file or directory\n");
+            }
+
+        }
+        else {
+
+            addBackgroundProcess(backgroundProcesses , procId , tokens);
+
+            if(waitpid(procId , processStat , WNOHANG) < 0) {
+                printf("Error: Background process %d exited with error...\n" , procId);
+            }
         }
 
         free(processStat);
 
         cleanRedirect(command); //free mem
 
-        for(int i = 0 ; i < inputLength ; i++) {
+        for(int i = 0 ; i < tokens->size ; i++) {
             free(args[i]);
         }
 

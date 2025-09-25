@@ -61,8 +61,8 @@ void ExternalCommand(tokenlist * tokens , backgroundProcs* backgroundProcesses ,
 
                             addBackgroundProcess(backgroundProcesses , pid , tokens);
 
-                            if(waitpid(pid , &status , WNOHANG) == -1) {
-                                //TODO: error case
+                            if(waitpid(pid , &status , WNOHANG) < 0) {
+                                printf("Error: Background process %d exited with error...\n" , pid);
                             }
                         }
                         else {

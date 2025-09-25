@@ -35,8 +35,13 @@ int main() {
 				continue;
 			}
 
-			if(waitpid(backProcs.activeBackgroundProcessPIDs[i] , &status , WNOHANG) > 0) { //process has returned
+			int sta = waitpid(backProcs.activeBackgroundProcessPIDs[i] , &status , WNOHANG);
+
+			if(sta > 0) { //process has returned
 				removeBackgroundProcess(&backProcs , backProcs.activeBackgroundProcessesJobNums[i]);
+			}
+			else if(sta == 0) {
+				reportRunningProcess(&backProcs , backProcs.activeBackgroundProcessesJobNums[i]);
 			}
 		}
 
@@ -94,10 +99,10 @@ int main() {
 		}
 
 		if(hasPiping) {
-			pipeCommands(tokens);
+			pipeCommands(tokens , &backProcs , sendToBack);
 		}
 		else if (hasRedirects) {
-			redirectInput(tokens->items , tokens->size);
+			redirectInput(tokens , &backProcs , sendToBack);
 		}
 		else {
         	//External command execution
