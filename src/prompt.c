@@ -1,5 +1,5 @@
-#include "../include/prompt.h"
-#include "../include/lexer.h"
+#include "prompt.h"
+#include "lexer.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <limits.h>
@@ -40,7 +40,6 @@ void prompt() {
 }
 
 /*
- Part 3
  - If ~ , replace with $HOME
  - If starts with ~/ , replace with $HOME + (token+1)
  

@@ -43,10 +43,19 @@ int main() {
         //turns ~ -> $HOME and ~/dir -> $HOME/dir.
         expand_tilde(tokens);
 
+		if (tokens->size > 0 && is_internal_command(tokens)) {
+    		int rc = run_internal_command(tokens, &backProcs); // cd/exit
+    		if (rc == -1) { // exit
+        		free(input);
+        		free_tokens(tokens);
+        		return 0; // end shell
+    		}
+    		if (rc == 1) ic_history_record(input);  // record only if success
+    		free(input);
+    		free_tokens(tokens);
+    		continue; // skip external path
+		}
 
-        /* [Part 4 - ADDED] PATH search
-        If the command is not a built-in and has no /, try to
-        resolve it against $PATH and show what would be executed. */
         if (tokens->size > 0 && tokens->items[0]) {   
 
             const char *cmd = tokens->items[0];   
@@ -124,16 +133,11 @@ int main() {
     		continue;                                 // skip external path/exec
 		}
 
-		if(hasPiping) {
-			pipeCommands(tokens , &backProcs , sendToBack);
-		}
-		else if (hasRedirects) {
-			redirectInput(tokens , &backProcs , sendToBack);
-		}
-		else {
-        	//External command execution
-			ExternalCommand(tokens , &backProcs , sendToBack);
-		}
+		int ok = 0;
+		if (hasPiping) { pipeCommands(tokens, &backProcs, sendToBack); ok = 1; }
+		else if (hasRedirects) { redirectInput(tokens, &backProcs, sendToBack); ok = 1; }
+		else { ok = ExternalCommand(tokens, &backProcs, sendToBack); }
+		if (ok) ic_history_record(input);
 
 		end:free(input);
 		free_tokens(tokens);

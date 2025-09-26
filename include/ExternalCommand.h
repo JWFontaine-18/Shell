@@ -3,4 +3,5 @@
 #include "lexer.h"
 #include "background.h"
 
-void ExternalCommand(tokenlist * tokens , backgroundProcs* backgroundProcesses , int sendtoBack);
+// CHANGED: return int (1=success, 0=fail) instead of void 
+int ExternalCommand(tokenlist *tokens, backgroundProcs *procs, int sendToBack);  // CHANGED
