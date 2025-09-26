@@ -71,10 +71,11 @@ int main() {
                 if (resolved) {                                            
                     free(resolved);                               
                 } else {
+					free(resolved);
                     // If it's a built-in we print nothing here; if not found in PATH, say so.
                     if (strchr(cmd, '/') == NULL)                 
                         printf("[resolve] command not found: %s\n", cmd); 
-						continue;
+						goto end;
                 }
             }
         }
@@ -109,8 +110,9 @@ int main() {
 			ExternalCommand(tokens , &backProcs , sendToBack);
 		}
 
-		free(input);
+		end:free(input);
 		free_tokens(tokens);
+
 		
 	}
 
