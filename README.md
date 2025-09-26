@@ -1,6 +1,6 @@
 # Shell
 
-[Description]
+A minimal shell supporting command execution, limited piping, redirection and background proccessing. 
 
 ## Group Members
 - **Hugh Long**: hal20a@fsu.edu
@@ -91,13 +91,13 @@ shell/
 ```bash
 make
 ```
-This will build the executable in ... bin
+This will build the executable in ... /bin/shell
 ### Execution
 ```bash
 make run
 ```
 This will run the program ...
-
+./bin/shell or make run
 ## Development Log
 
 ### Hugh Long
