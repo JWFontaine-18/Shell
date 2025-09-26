@@ -89,6 +89,16 @@ void reportRunningProcess(backgroundProcs* processes , int jobNum) {
   
 }
 
+void listBackgroundProcesses(backgroundProcs* processes) {
+
+    for(int i = 0 ; i < 10 ; i++) {
+
+        if(processes->activeBackgroundProcessesJobNums[i] != 0 ) { //process is active
+            
+            reportRunningProcess(processes ,  processes->activeBackgroundProcessesJobNums[i]);
+        }
+    }
+}
 //removes an ampersand from the input tokens, do not call if no ampersand present
 //returns tokenlist in format expected by execv for args
 void removeAmpersand(tokenlist* tokens) {

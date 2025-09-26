@@ -25,4 +25,6 @@ void removeBackgroundProcess(backgroundProcs* processes , int jobNum);
 
 void reportRunningProcess(backgroundProcs* processes , int jobNum);
 
+void listBackgroundProcesses(backgroundProcs* processes);
+
 #endif

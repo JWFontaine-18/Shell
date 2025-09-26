@@ -27,24 +27,6 @@ int main() {
 
 	while (1) {
 
-		int status;
-
-		for(int i = 0 ; i < 10; i++) {
-
-			if(backProcs.activeBackgroundProcessPIDs[i] == 0){
-				continue;
-			}
-
-			int sta = waitpid(backProcs.activeBackgroundProcessPIDs[i] , &status , WNOHANG);
-
-			if(sta > 0) { //process has returned
-				removeBackgroundProcess(&backProcs , backProcs.activeBackgroundProcessesJobNums[i]);
-			}
-			else if(sta == 0) {
-				reportRunningProcess(&backProcs , backProcs.activeBackgroundProcessesJobNums[i]);
-			}
-		}
-
 		prompt();
 
 		/* input contains the whole command
@@ -64,14 +46,28 @@ int main() {
         /* [Part 4 - ADDED] PATH search
         If the command is not a built-in and has no /, try to
         resolve it against $PATH and show what would be executed. */
-        if (tokens->size > 0 && tokens->items[0]) {               
-            const char *cmd = tokens->items[0];                   
-            if (!is_builtin(cmd)) {                               
-                char *resolved = search_path_for_command(cmd);    
-                if (resolved) {                                            
-                    free(resolved);                               
+        if (tokens->size > 0 && tokens->items[0]) {   
+
+            const char *cmd = tokens->items[0];   
+
+			if( strcmp(cmd , "jobs") == 0 ) { //user asking for jobs
+
+				listBackgroundProcesses(&backProcs);
+				goto end;
+			}
+
+            if (!is_builtin(cmd)) {      
+
+                char *resolved = search_path_for_command(cmd); 
+
+                if (resolved) {    
+
+                    free(resolved);    
+
                 } else {
+
 					free(resolved);
+
                     // If it's a built-in we print nothing here; if not found in PATH, say so.
                     if (strchr(cmd, '/') == NULL)                 
                         printf("[resolve] command not found: %s\n", cmd); 
@@ -79,6 +75,21 @@ int main() {
                 }
             }
         }
+
+		int status;
+
+		for(int i = 0 ; i < 10; i++) {
+
+			if(backProcs.activeBackgroundProcessPIDs[i] == 0){
+				continue;
+			}
+
+			int sta = waitpid(backProcs.activeBackgroundProcessPIDs[i] , &status , WNOHANG);
+
+			if(sta > 0) { //process has returned
+				removeBackgroundProcess(&backProcs , backProcs.activeBackgroundProcessesJobNums[i]);
+			}
+		}
 
 		int hasPiping = 0;
 		int hasRedirects = 0;
