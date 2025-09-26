@@ -12,6 +12,7 @@
 #include <errno.h>      
 #include "piping.h" 
 #include "background.h"    
+#include "InternalCommand.h"
 
 int main() {
 
@@ -108,6 +109,19 @@ int main() {
 				sendToBack = 1;
 				removeAmpersand(tokens); //remove special
 			}
+		}
+
+		if (tokens->size > 0 && is_internal_command(tokens)) {
+    		ic_history_record(input);                 // track for exit history
+    		int rc = run_internal_command(tokens, &backProcs);
+    		if (rc == -1) {                           // exit
+     		   free(input);
+    		    free_tokens(tokens);
+    		    break;
+   			}
+   		 	free(input);
+   		 	free_tokens(tokens);
+    		continue;                                 // skip external path/exec
 		}
 
 		if(hasPiping) {
