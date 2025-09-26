@@ -3,7 +3,7 @@
 [Description]
 
 ## Group Members
-- **John Doe**: jd19@fsu.edu
+- **Hugh Long**: hal20a@fsu.edu
 - **Jane Smith**: js19@fsu.edu
 - **Alex Brown**: ab19@fsu.edu
 ## Division of Labor
@@ -29,16 +29,16 @@
 - **Assigned to**: Alex Brown, Jane Smith
 
 ### Part 6: I/O Redirection
-- **Responsibilities**: [Description]
-- **Assigned to**: Jane Smith
+- **Responsibilities**:All: a couple of functions support io-redirection, expects only one command
+- **Assigned to**: Hugh Long
 
 ### Part 7: Piping
-- **Responsibilities**: [Description]
-- **Assigned to**: John Doe
+- **Responsibilities**: All: piping only supports 2 pipes/3 commands per proj description
+- **Assigned to**: Hugh Long
 
 ### Part 8: Background Processing
-- **Responsibilities**: [Description]
-- **Assigned to**: Alex Brown, John Doe
+- **Responsibilities**: All: typedef with mutator functions enables keeping track of background processes
+- **Assigned to**: Hugh Long
 
 ### Part 9: Internal Command Execution
 - **Responsibilities**: [Description]
@@ -57,27 +57,41 @@
 shell/
 │
 ├── src/
-│ ├── main.c
-│ └── shell.c
+│ ├── background.c
+│ └── command_utils.c
+| └── externalcomands.c
+| └── ioredirect.c
+| └── lexer.c
+| └── path_search.c
+| └── piping.c
+| └── prompt.c
+| └── 
 │
 ├── include/
-│ └── shell.h
-│
+│ └── piping.h
+| └── background.h
+| └── command_utils.h
+| └── externalcommand.h
+| └── lexer.h
+| └── path_search.h
+│ └── piping.h
+| └── prompt.h
+| └── redirect.h
 ├── README.md
+|── .gitignore
 └── Makefile
 ```
 ## How to Compile & Execute
 
 ### Requirements
-- **Compiler**: e.g., `gcc` for C/C++, `rustc` for Rust.
-- **Dependencies**: List any libraries or frameworks necessary (rust only).
+- **Compiler**: gcc.
+- **Dependencies**: none
 
 ### Compilation
-For a C/C++ example:
 ```bash
 make
 ```
-This will build the executable in ...
+This will build the executable in ... bin
 ### Execution
 ```bash
 make run
@@ -85,21 +99,21 @@ make run
 This will run the program ...
 
 ## Development Log
-9/12/25 - Part 3 implemented by Steven Kester
 
-### [Member 1]
-
-| Date       | Work Completed / Notes |
-|------------|------------------------|
-| YYYY-MM-DD | [Description of task]  |
-| YYYY-MM-DD | [Description of task]  |
-| YYYY-MM-DD | [Description of task]  |
-
-### [Member 2]
+### Hugh Long
 
 | Date       | Work Completed / Notes |
 |------------|------------------------|
-| YYYY-MM-DD | [Description of task]  |
+| 2025-09-16 | part 6 implement  |
+| 2025-09-18 | part 7 implement  |
+| 2025-09-22 | part 8 implement  |
+| 2025-09-25 | mem leak fix on error    |   
+                          
+### Steven Kester
+
+| Date       | Work Completed / Notes |
+|------------|------------------------|
+| 2025-09-12 | part 3 implement  |
 | YYYY-MM-DD | [Description of task]  |
 | YYYY-MM-DD | [Description of task]  |
 
@@ -118,8 +132,8 @@ Document in-person meetings, their purpose, and what was discussed.
 
 | Date       | Attendees            | Topics Discussed | Outcomes / Decisions |
 |------------|----------------------|------------------|-----------------------|
-| YYYY-MM-DD | [Names]              | [Agenda items]   | [Actions/Next steps]  |
-| YYYY-MM-DD | [Names]              | [Agenda items]   | [Actions/Next steps]  |
+| 2025-09-08 | All              | work assignments   | turn in work division  |
+| 2025-09-15 | checkup              | begin work/check status   | complete work assigned, keep in contact over discord  |
 
 
 
