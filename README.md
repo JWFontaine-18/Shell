@@ -44,14 +44,6 @@ A minimal shell supporting command execution, limited piping, redirection and ba
 - **Responsibilities**: [Description]
 - **Assigned to**: Steven Kester
 
-### Part 10: External Timeout Executable
-- **Responsibilities**: [Description]
-- **Assigned to**: Alex Brown, Jane Smith
-
-### Extra Credit
-- **Responsibilities**: [Description]
-- **Assigned to**: Hugh Long 
-
 ## File Listing
 ```
 shell/
@@ -137,16 +129,3 @@ Document in-person meetings, their purpose, and what was discussed.
 | 2025-09-15 | checkup              | begin work/check status   | complete work assigned, keep in contact over discord  |
 
 
-
-## Bugs
-- **Bug 1**: This is bug 1.
-- **Bug 2**: This is bug 2.
-- **Bug 3**: This is bug 3.
-
-## Extra Credit
-- **Extra Credit 1**: [Extra Credit Option]
-- **Extra Credit 2**: [Extra Credit Option]
-- **Extra Credit 3**: [Extra Credit Option]
-
-## Considerations
-[Description]
