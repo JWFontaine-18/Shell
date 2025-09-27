@@ -5,7 +5,7 @@ A minimal shell supporting command execution, limited piping, redirection and ba
 ## Group Members
 - **Hugh Long**: hal20a@fsu.edu
 - **James Fontaine**: jwf22c@fsu.edu
-- **Alex Brown**: ab19@fsu.edu
+- **Steven Kester**: sck22a@fsu.edu
 ## Division of Labor
 
 ### Part 1: Prompt
@@ -17,15 +17,15 @@ A minimal shell supporting command execution, limited piping, redirection and ba
 - **Assigned to**: James Fontaine
 
 ### Part 3: Tilde Expansion
-- **Responsibilities**: [Description]
-- **Assigned to**: Alex Brown
+- **Responsibilities**: [Expand ~ to $HOME and ~/dir to $HOME/dir. Only handle standalone ~ or paths beginning with ~/]
+- **Assigned to**: Steven Kester
 
 ### Part 4: $PATH Search
-- **Responsibilities**: [Description]
-- **Assigned to**: Alex Brown, Jane Smith
+- **Responsibilities**: [Search directories in $PATH for a command if it doesn’t contain / and isn’t a built-in. Return the absolute path if found, otherwise print “command not found”]
+- **Assigned to**: Steven Kester
 
 ### Part 5: External Command Execution
-- **Responsibilities**: [Description]
+- **Responsibilities**: [Use fork() and execv() to run external commands. Parent process waits unless run in background. Handles arguments, absolute/relative paths, and integrates with $PATH search]
 - **Assigned to**: Steven Kester, James Fontaine
 
 ### Part 6: I/O Redirection
@@ -42,7 +42,7 @@ A minimal shell supporting command execution, limited piping, redirection and ba
 
 ### Part 9: Internal Command Execution
 - **Responsibilities**: [Description]
-- **Assigned to**: Alex Brown
+- **Assigned to**: Steven Kester
 
 ### Part 10: External Timeout Executable
 - **Responsibilities**: [Description]
@@ -59,19 +59,19 @@ shell/
 ├── src/
 │ ├── background.c
 │ └── command_utils.c
-| └── externalcomands.c
+| └── ExternalCommand.c
+| └── InternalCommand.c
 | └── ioredirect.c
 | └── lexer.c
 | └── path_search.c
 | └── piping.c
 | └── prompt.c
-| └── 
 │
 ├── include/
-│ └── piping.h
 | └── background.h
 | └── command_utils.h
-| └── externalcommand.h
+| └── ExternalCommand.h
+| └── InternalCommand.h
 | └── lexer.h
 | └── path_search.h
 │ └── piping.h
@@ -114,8 +114,9 @@ This will run the program ...
 | Date       | Work Completed / Notes |
 |------------|------------------------|
 | 2025-09-12 | part 3 implement  |
-| YYYY-MM-DD | [Description of task]  |
-| YYYY-MM-DD | [Description of task]  |
+| 2025-09-14 | part 4 implement  |
+| 2025-09-28 | part 5 implement |
+| 2025-09-26 | part 9 implement + fixes to history & PWD |
 
 
 ### James Fontaine
