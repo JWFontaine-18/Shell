@@ -4,17 +4,17 @@ A minimal shell supporting command execution, limited piping, redirection and ba
 
 ## Group Members
 - **Hugh Long**: hal20a@fsu.edu
-- **Jane Smith**: js19@fsu.edu
+- **James Fontaine**: jwf22c@fsu.edu
 - **Alex Brown**: ab19@fsu.edu
 ## Division of Labor
 
 ### Part 1: Prompt
-- **Responsibilities**: [Description]
-- **Assigned to**: John Doe
+- **Responsibilities**: [Greet user with prompt]
+- **Assigned to**: James Fontaine
 
 ### Part 2: Environment Variables
-- **Responsibilities**: [Description]
-- **Assigned to**: Jane Smith
+- **Responsibilities**: [Expand env variable by replacing tokens prefixed with '$']
+- **Assigned to**: James Fontaine
 
 ### Part 3: Tilde Expansion
 - **Responsibilities**: [Description]
@@ -26,11 +26,11 @@ A minimal shell supporting command execution, limited piping, redirection and ba
 
 ### Part 5: External Command Execution
 - **Responsibilities**: [Description]
-- **Assigned to**: Alex Brown, Jane Smith
+- **Assigned to**: Steven Kester, James Fontaine
 
 ### Part 6: I/O Redirection
 - **Responsibilities**:All: a couple of functions support io-redirection, expects only one command
-- **Assigned to**: Hugh Long
+- **Assigned to**: Hugh Long, James Fontaine
 
 ### Part 7: Piping
 - **Responsibilities**: All: piping only supports 2 pipes/3 commands per proj description
@@ -38,7 +38,7 @@ A minimal shell supporting command execution, limited piping, redirection and ba
 
 ### Part 8: Background Processing
 - **Responsibilities**: All: typedef with mutator functions enables keeping track of background processes
-- **Assigned to**: Hugh Long
+- **Assigned to**: Hugh Long, James Fontaine
 
 ### Part 9: Internal Command Execution
 - **Responsibilities**: [Description]
@@ -50,7 +50,7 @@ A minimal shell supporting command execution, limited piping, redirection and ba
 
 ### Extra Credit
 - **Responsibilities**: [Description]
-- **Assigned to**: Alex Brown
+- **Assigned to**: Hugh Long 
 
 ## File Listing
 ```
@@ -118,13 +118,13 @@ This will run the program ...
 | YYYY-MM-DD | [Description of task]  |
 
 
-### [Member 3]
+### James Fontaine
 
 | Date       | Work Completed / Notes |
 |------------|------------------------|
-| YYYY-MM-DD | [Description of task]  |
-| YYYY-MM-DD | [Description of task]  |
-| YYYY-MM-DD | [Description of task]  |
+| 2025-09-10 | Part 1/ 2 Implement  |
+| 2025-09-15 | PArt 6 Implementation |
+| 2025-09-22 | Part 8 Started implementation |
 
 
 ## Meetings
