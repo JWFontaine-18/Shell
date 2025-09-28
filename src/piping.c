@@ -78,11 +78,11 @@ void createChildProcesses(char** commands , const int numCommands , char*** args
     else {
 
         for(int i = 0 ; i < numCommands ; i++) {
-            
-            addBackgroundProcess(backgroundProcesses , pids[i] , tokens);
 
             waitpid(pids[i] , NULL , WNOHANG);
         }
+
+        addBackgroundProcess(backgroundProcesses , pids[numCommands - 1] , tokens);
     }
 
     return;
