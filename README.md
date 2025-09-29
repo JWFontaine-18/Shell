@@ -41,7 +41,7 @@ A minimal shell supporting command execution, limited piping, redirection and ba
 - **Assigned to**: Hugh Long, James Fontaine
 
 ### Part 9: Internal Command Execution
-- **Responsibilities**: [Description]
+- **Responsibilities**: [Implement built-ins cd, exit, and jobs. cd changes directories and updates $PWD. exit waits for background jobs and prints the last valid commands. jobs lists active background processes.]
 - **Assigned to**: Steven Kester
 
 ## File Listing
