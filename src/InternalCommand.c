@@ -8,7 +8,8 @@
 #include <unistd.h>     
 #include <errno.h>
 #include <sys/wait.h>
-#include <limits.h>    
+#include <limits.h>   
+#include "background.h" 
 
 #define IC_MAX_CMDLEN 200
 #define _POSIX_C_SOURCE 200809L
@@ -70,6 +71,7 @@ static void wait_all_background(backgroundProcs *procs) {
         pid_t pid = procs->activeBackgroundProcessPIDs[i];
         if (pid > 0) {
             while (waitpid(pid, &status, 0) < 0 && errno == EINTR) {}
+            removeBackgroundProcess(procs , procs->activeBackgroundProcessesJobNums[i]);
         }
     }
 }
