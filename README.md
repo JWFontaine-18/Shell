@@ -129,4 +129,3 @@ Document in-person meetings, their purpose, and what was discussed.
 | 2025-09-15 | checkup              | begin work/check status   | complete work assigned, keep in contact over discord  |
 
 # Bugs
-The program will only record the first command in a piping command for the purposes of the 'exit' function. Piping works normally.
