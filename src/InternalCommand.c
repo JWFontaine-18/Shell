@@ -73,7 +73,7 @@ static void wait_all_background(backgroundProcs *procs) {
             while (waitpid(pid, &status, 0) < 0 && errno == EINTR) {}
             removeBackgroundProcess(procs , procs->activeBackgroundProcessesJobNums[i]);
         }
-    }
+    } 
 }
 
 int is_internal_command(tokenlist *tokens) {
